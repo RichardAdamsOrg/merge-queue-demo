@@ -1,0 +1,18 @@
+name: On Merge
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record merge
+        run: |
+          echo "✅ Merged to main"
+          echo "   Commit : ${{ github.sha }}"
+          echo "   Message: ${{ github.event.head_commit.message }}"
+          echo "   Time   : $(date -u '+%Y-%m-%dT%H:%M:%SZ')"

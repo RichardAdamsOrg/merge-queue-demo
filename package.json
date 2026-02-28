@@ -1,0 +1,15 @@
+{
+  "name": "merge-queue-test",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "create-prs": "ts-node scripts/create-prs.ts",
+    "clean": "ts-node scripts/create-prs.ts --clean",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
