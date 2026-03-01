@@ -42,6 +42,14 @@ function pad(n: number): string {
   return String(n).padStart(3, '0');
 }
 
+function tryRun(cmd: string): string | null {
+  try {
+    return execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // --clean: close all open demo/* PRs and delete their branches
 // ---------------------------------------------------------------------------
@@ -104,6 +112,8 @@ for (let i = 1; i <= count; i++) {
 
   console.log(`[${i}/${count}] Creating branch ${branch}${isFailing ? ' (WILL FAIL CI)' : ''}...`);
 
+  // Delete local branch if it already exists from a previous run
+  tryRun(`git branch -D ${branch}`);
   run(`git checkout -b ${branch}`);
 
   // Each PR creates its own unique file — zero merge conflicts possible
@@ -122,19 +132,28 @@ for (let i = 1; i <= count; i++) {
 
   run('git add .');
   run(`git commit -m "demo: add entry ${num}${isFailing ? ' [will fail CI]' : ''}"`);
-  run(`git push origin ${branch}`);
+  // Force-push in case the remote branch already exists from a previous run
+  run(`git push --force origin ${branch}`);
 
   const title = `Demo PR ${num}${isFailing ? ' (expected CI failure)' : ''}`;
   const body = isFailing
     ? `This PR intentionally fails CI to demonstrate merge queue ejection.\n\nDelete \`SHOULD_FAIL\` to make it pass.`
     : `Adds \`entries/pr-${num}.md\`. Part of a merge queue demo.`;
 
-  run(`gh pr create --title "${title}" --body "${body}" --base main`);
+  // Only create a new PR if one doesn't already exist for this branch
+  const existingPRs = JSON.parse(
+    run(`gh pr list --head ${branch} --json number --state open`)
+  ) as Array<{ number: number }>;
+
+  if (existingPRs.length > 0) {
+    console.log(`    PR #${existingPRs[0].number} already exists for ${branch}, skipping creation`);
+  } else {
+    run(`gh pr create --title "${title}" --body "${body}" --base main`);
+    console.log(`    PR created for ${branch}`);
+  }
 
   // Return to main before creating the next branch
   run('git checkout main');
-
-  console.log(`    PR created for ${branch}`);
 }
 
 console.log(`\nDone! ${count} PR(s) created and ready to enter the merge queue.`);
