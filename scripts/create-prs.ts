@@ -113,13 +113,18 @@ console.log(
   }.\n`,
 );
 
+// Unique tag for this run — used in branch names and file content so that
+// re-runs never collide with previously merged branches/files.
+const runTag = new Date().toISOString().slice(0, 16).replace(/[T:]/g, "-");
+// e.g. "2026-03-01-14-30" → branches: demo/pr-001-2026-03-01-14-30
+
 // Make sure we're on main and up to date
 run("git checkout main");
 run("git pull origin main");
 
 for (let i = 1; i <= count; i++) {
   const num = pad(i);
-  const branch = `demo/pr-${num}`;
+  const branch = `demo/pr-${num}-${runTag}`;
   const isFailing = failSet.has(i);
 
   console.log(
