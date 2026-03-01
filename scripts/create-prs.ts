@@ -113,6 +113,10 @@ console.log(
   }.\n`,
 );
 
+// Unique ID for this run so re-runs always produce a new commit even if
+// the same branch names are reused after a previous demo was merged.
+const runId = new Date().toISOString().replace(/[:.]/g, "-");
+
 // Make sure we're on main and up to date
 run("git checkout main");
 run("git pull origin main");
@@ -136,7 +140,7 @@ for (let i = 1; i <= count; i++) {
   fs.mkdirSync("entries", { recursive: true });
   fs.writeFileSync(
     path.join("entries", `pr-${num}.md`),
-    `# Entry ${num}\n\nAdded by demo branch \`${branch}\`.\n`,
+    `# Entry ${num}\n\nAdded by demo branch \`${branch}\` (run: ${runId}).\n`,
   );
 
   if (isFailing) {
