@@ -23,10 +23,11 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Check for CI failure marker
+      - name: Check for CI failure marker (merge queue only)
+        if: github.event_name == 'merge_group'
         run: |
           if [ -f "SHOULD_FAIL" ]; then
-            echo "::error::SHOULD_FAIL marker present — this PR is configured to fail CI"
+            echo "::error::SHOULD_FAIL marker present — this PR is configured to fail in the merge queue"
             exit 1
           fi
-          echo "No failure marker found. CI passes."
+          echo "No failure marker found. Merge queue check passes."
