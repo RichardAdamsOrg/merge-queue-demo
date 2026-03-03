@@ -1,4 +1,4 @@
-This project is to demo aspects of merge queues for a live demo to engineering colleagues. I need to be able to create PRs easily and show th effects of changun merge queue configuration.
+This project is to demo aspects of merge queues for a live demo to engineering colleagues. I need to be able to create PRs easily and show the effects of changing merge queue configuration.
 
 
 
